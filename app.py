@@ -1,5 +1,5 @@
 # import psycopg2
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -21,11 +21,17 @@ db.create_all()
 
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
-    description = request.form.get('description', '')
+    # get the input user sent
+    description = request.get_json()['description']
+    # create a new pending addition to todos table
     todo = Todo(description=description)
     db.session.add(todo)
+    # commit that to the db
     db.session.commit()
-    return redirect(url_for('index'))
+    # redirect user back to index page
+    return jsonify({
+        'description': todo.description
+    })
 
 
 @app.route('/')
