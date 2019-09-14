@@ -16,6 +16,19 @@
         list-style: none;
         padding: 0;
         margin: 0;
+        width: 200px;
+      }
+      li {
+        clear: both;
+      }
+      .remove {
+        -webkit-appearance: none;
+        outline: none;
+        border: none;
+        color: red;
+        cursor: pointer;
+        font-size: 20px;
+        float: right;
       }
     </style>
   </head>
@@ -32,11 +45,32 @@
       {% for d in data %}
         <li>
           <input data-id="{{ d.id }}" class="check-completed" type="checkbox" {% if d.completed %} checked {% endif %}>{{ d.description }}</input>
+          <button data-id="{{ d.id }}" class="remove">&cross;</button>
         </li>
       {% endfor %}
     </ul>
     <script>
       const checkboxes = document.querySelectorAll('.check-completed');
+      const removebuttons = document.querySelectorAll('.remove');
+
+      for(let i = 0; i<removebuttons.length; i++) {
+        const removebutton = removebuttons[i];
+
+        removebutton.onclick = function(e) {
+          const todoId = e.target.dataset['id'];
+
+          fetch('/todos/' + todoId + '/delete', {
+            method: "DELETE",
+          })
+          .then(function() {
+            document.getElementById('error').className='hidden'
+          })
+          .catch(function() {
+            document.getElementById('error').className="red";
+          })
+        }
+      }
+
       for (let i = 0; i < checkboxes.length; i++) {
         const checkbox = checkboxes[i];
         
